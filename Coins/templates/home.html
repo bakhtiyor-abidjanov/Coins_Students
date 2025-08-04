@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Document</title>
+    <style>
+        table, th, td { border: 1px solid #ddd; border-collapse: collapse; padding: 5px; text-align: center; }
+        .yes { background-color: #8f8; }
+        .no { background-color: #f88; }
+        input.attendance-input {
+            width: 40px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        function colorizeInputs() {
+            document.querySelectorAll('.attendance-input').forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.value.toLowerCase() === 'yes') {
+                        input.style.backgroundColor = '#8f8';
+                    } else if (input.value.toLowerCase() === 'no') {
+                        input.style.backgroundColor = '#f88';
+                    } else {
+                        input.style.backgroundColor = 'white';
+                    }
+                });
+            });
+        }
+        window.onload = colorizeInputs;
+    </script>
+</head>
+<body>
+    <h2>Coins</h2>
+    <form method="post">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <th>Список студентов</th>
+                {% for d in august_dates %}
+                    <th>{{ d.day }}.08</th>
+                {% endfor %}
+                <th>Сегодня</th>
+                <th>Общий</th>
+                <th>Coins</th>
+            </tr>
+            {% for row in student_rows %}
+            <tr>
+                <td>{{ row.student.fullname }}</td>
+                {% for att in row.attendances %}
+                    <td>
+                        <input type="text" name="status_{{ row.student.id }}_{{ att.date }}" 
+                               value="{{ att.status }}" class="attendance-input">
+                    </td>
+                {% endfor %}
+                <td>{{ row.today_coins }}</td>
+                <td>{{ row.total_coins }}</td>
+                <td><input type="number" name="coins_{{ row.student.id }}" min="0"></td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="{{ august_dates|length|add:4 }}">Макс. кол-во монет сегодня: {{ max_daily_coins }}</td>
+            </tr>
+        </table>
+        <button type="submit">Сохранить</button>
+    </form>
+</body>
+</html>
